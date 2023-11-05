@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DataService } from "../../services/olympic-data.service";
 import { OlympicData } from "../../models/olympic-data.model";
 import { Router } from "@angular/router";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import { Router } from "@angular/router";
 
 export class HomeComponent implements OnInit {
   olympicData!: OlympicData[];
+  private dataSub!: Subscription;
   public nbJO!: number;
   public nbCountry!: number;
 
@@ -21,7 +23,7 @@ export class HomeComponent implements OnInit {
   constructor(private dataService: DataService, private router: Router) {}
 
   ngOnInit(): void {
-    this.dataService.getData().subscribe((data: OlympicData[]): void => {
+    this.dataSub = this.dataService.getData().subscribe((data: OlympicData[]): void => {
       // load data
       this.olympicData = data;
 
@@ -52,5 +54,9 @@ export class HomeComponent implements OnInit {
   onSelect(event: { name: string; }): void {
     const countryClicked: string = event.name;
     this.router.navigate(['/details', countryClicked]);
+  }
+
+  OnDestroy(): void {
+    this.dataSub.unsubscribe();
   }
 }

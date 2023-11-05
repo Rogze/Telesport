@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DataService } from "../../services/olympic-data.service";
 import { OlympicData } from '../../models/olympic-data.model';
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-details',
@@ -12,6 +13,7 @@ import { OlympicData } from '../../models/olympic-data.model';
 
 export class DetailsComponent implements OnInit {
   olympicDataForCountry?: OlympicData;
+  private dataSub!: Subscription;
 
   // Informations
   nbParticipation!: number;
@@ -31,7 +33,7 @@ export class DetailsComponent implements OnInit {
   ngOnInit(): void {
     const country: string = this.route.snapshot.params['country'];
 
-    this.dataService.getData().subscribe((data: OlympicData[]) => {
+    this.dataSub = this.dataService.getData().subscribe((data: OlympicData[]) => {
       const countryData = data.find(item => item.country === country);
 
       if (countryData) {
@@ -53,6 +55,10 @@ export class DetailsComponent implements OnInit {
         ];
       }
     });
+  }
+
+  OnDestroy(): void {
+    this.dataSub.unsubscribe();
   }
 
 }
